@@ -37,6 +37,10 @@ const terminal = (context, x, y, width, height) => {
   context.fillStyle = "#000000";
   context.globalAlpha = 0.75;
 
+  context.shadowColor = "rgba(0, 0, 0, .45)";
+  context.shadowOffsetY = 30;
+  context.shadowBlur = 35;
+
   context.beginPath();
   context.moveTo(x + terminalBorderRadius, y);
   context.lineTo(x + width - terminalBorderRadius, y);
@@ -55,7 +59,10 @@ const terminal = (context, x, y, width, height) => {
   context.closePath();
   context.fill();
 
+  context.shadowBlur = 0;
   context.globalAlpha = 1;
+  context.shadowOffsetY = 0;
+  context.shadowBlur = 30;
 };
 
 const text = (context, text) => {
