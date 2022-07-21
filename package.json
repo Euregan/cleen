@@ -1,13 +1,11 @@
 {
   "name": "cleen",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.0",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
+  "bin": "index.js",
+  "scripts": {},
+  "author": "Valentin Manceaux-Panot",
+  "license": "MIT",
   "dependencies": {
     "canvas": "^2.9.3"
   },
