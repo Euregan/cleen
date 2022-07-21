@@ -24,8 +24,18 @@ const terminalBorderRadius = 20;
 const backgroundHorizontalMargin = 90;
 const backgroundVerticalMargin = 90;
 
+const background = (context, width, height) => {
+  const gradient = context.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, "#88c0d0");
+  gradient.addColorStop(1, "#5e81ac");
+
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, width, height);
+};
+
 const terminal = (context, x, y, width, height) => {
-  context.fillStyle = "#000";
+  context.fillStyle = "#000000";
+  context.globalAlpha = 0.75;
 
   context.beginPath();
   context.moveTo(x + terminalBorderRadius, y);
@@ -44,6 +54,8 @@ const terminal = (context, x, y, width, height) => {
   context.quadraticCurveTo(x, y, x + terminalBorderRadius, y);
   context.closePath();
   context.fill();
+
+  context.globalAlpha = 1;
 };
 
 const text = (context, text) => {
@@ -73,6 +85,12 @@ const print = (input) => {
     height + 2 * terminalVerticalMargin + 2 * backgroundVerticalMargin
   );
   const context = canvas.getContext("2d");
+
+  background(
+    context,
+    width + 2 * terminalHorizontalMargin + 2 * backgroundHorizontalMargin,
+    height + 2 * terminalVerticalMargin + 2 * backgroundVerticalMargin
+  );
 
   terminal(
     context,
