@@ -3,7 +3,7 @@
 const fs = require("fs");
 const { createCanvas, registerFont } = require("canvas");
 
-registerFont("./FiraCode.ttf", { family: "Fira Code" });
+registerFont(`${__dirname}/FiraCode.ttf`, { family: "Fira Code" });
 
 {
   const stdin = process.openStdin();
