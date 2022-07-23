@@ -3,7 +3,11 @@
 const fs = require("fs");
 const { createCanvas, registerFont } = require("canvas");
 
-registerFont(`${__dirname}/FiraCode.ttf`, { family: "Fira Code" });
+registerFont(`${__dirname}/FiraCode-Light.ttf`, { family: "Fira Code Light" });
+registerFont(`${__dirname}/FiraCode-Regular.ttf`, {
+  family: "Fira Code Regular",
+});
+registerFont(`${__dirname}/FiraCode-Bold.ttf`, { family: "Fira Code Bold" });
 
 {
   const stdin = process.openStdin();
@@ -13,7 +17,6 @@ registerFont(`${__dirname}/FiraCode.ttf`, { family: "Fira Code" });
   stdin.on("data", (chunk) => (data += chunk));
 
   stdin.on("end", () => {
-    console.log(data);
     print(data.slice(0, -1));
   });
 }
@@ -23,6 +26,46 @@ const terminalVerticalMargin = 30;
 const terminalBorderRadius = 20;
 const backgroundHorizontalMargin = 90;
 const backgroundVerticalMargin = 90;
+
+const modifier = (context, modifier) => {
+  const modifiers = modifier.match(/(\d+;?)+/)[0].split(";");
+  modifiers.forEach((modifier) => {
+    switch (modifier) {
+      case "0":
+        context.font = "20px Fira Code Regular";
+        context.fillStyle = "white";
+        break;
+      case "01":
+      case "1":
+        context.font = "20px Fira Code Bold";
+        break;
+      case "30":
+        context.fillStyle = "#3b4252";
+        break;
+      case "31":
+        context.fillStyle = "#bf616a";
+        break;
+      case "32":
+        context.fillStyle = "#a3be8c";
+        break;
+      case "33":
+        context.fillStyle = "#ebcb8b";
+        break;
+      case "34":
+        context.fillStyle = "#81a1c1";
+        break;
+      case "35":
+        context.fillStyle = "#b48ead";
+        break;
+      case "36":
+        context.fillStyle = "#88c0d0";
+        break;
+      case "37":
+        context.fillStyle = "#e5e9f0";
+        break;
+    }
+  });
+};
 
 const background = (context, width, height) => {
   const gradient = context.createLinearGradient(0, 0, width, height);
@@ -66,21 +109,46 @@ const terminal = (context, x, y, width, height) => {
 };
 
 const text = (context, text) => {
-  context.font = "20px Fira Code";
+  context.font = "20px Fira Code Regular";
   context.textAlign = "left";
   context.textBaseline = "top";
   context.fillStyle = "white";
 
-  context.fillText(
-    text,
-    backgroundHorizontalMargin + terminalHorizontalMargin,
-    backgroundVerticalMargin + terminalVerticalMargin
-  );
+  const textMeasurements = context.measureText(text);
+  const height =
+    textMeasurements.actualBoundingBoxAscent +
+    textMeasurements.actualBoundingBoxDescent;
+
+  const leftPosition = backgroundHorizontalMargin + terminalHorizontalMargin;
+  const lineHeight = height / text.split("\n").length;
+
+  const withModifiers = text.split(/(\x1B.+?m)/);
+  let offsetX = leftPosition;
+  let offsetY = backgroundVerticalMargin + terminalVerticalMargin;
+
+  withModifiers.forEach((chunk) => {
+    if (chunk.startsWith("\x1B")) {
+      modifier(context, chunk);
+    } else {
+      const lines = chunk.split("\n");
+      lines.forEach((line, index) => {
+        context.fillText(line, offsetX, offsetY);
+
+        if (index === lines.length - 1) {
+          const { width } = context.measureText(line);
+          offsetX = leftPosition + width;
+        } else {
+          offsetX = leftPosition;
+          offsetY += lineHeight;
+        }
+      });
+    }
+  });
 };
 
 const print = (input) => {
   const throwableContext = createCanvas(1, 1).getContext("2d");
-  throwableContext.font = "20px Fira Code";
+  throwableContext.font = "20px Fira Code Regular";
 
   const { width, ...textMeasurements } = throwableContext.measureText(input);
   const height =
