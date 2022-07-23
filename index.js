@@ -28,8 +28,10 @@ const backgroundHorizontalMargin = 90;
 const backgroundVerticalMargin = 90;
 
 const modifier = (context, modifier) => {
-  const modifiers = modifier.match(/(\d+;?)+/)[0].split(";");
-  modifiers.forEach((modifier) => {
+  const parsedModifiers = modifier.match(/(\d+;?)+/);
+  const modifiers = parsedModifiers ? parsedModifiers[0].split(";") : [];
+
+  const backgrounds = modifiers.map((modifier) => {
     switch (modifier) {
       case "0":
         context.font = "20px Fira Code Regular";
@@ -39,32 +41,58 @@ const modifier = (context, modifier) => {
       case "1":
         context.font = "20px Fira Code Bold";
         break;
-      case "30":
+      case "30": // black
         context.fillStyle = "#3b4252";
         break;
-      case "31":
+      case "31": // red
         context.fillStyle = "#bf616a";
         break;
-      case "32":
+      case "32": // green
         context.fillStyle = "#a3be8c";
         break;
-      case "33":
+      case "33": // yellow
         context.fillStyle = "#ebcb8b";
         break;
-      case "34":
+      case "34": // blue
         context.fillStyle = "#81a1c1";
         break;
-      case "35":
+      case "35": // magenta
         context.fillStyle = "#b48ead";
         break;
-      case "36":
+      case "36": // cyan
         context.fillStyle = "#88c0d0";
         break;
-      case "37":
+      case "37": // white
         context.fillStyle = "#e5e9f0";
+        break;
+      case "40": // black
+        return "#3b4252";
+        break;
+      case "41": // red
+        return "#bf616a";
+        break;
+      case "42": // green
+        return "#a3be8c";
+        break;
+      case "43": // yellow
+        return "#ebcb8b";
+        break;
+      case "44": // blue
+        return "#81a1c1";
+        break;
+      case "45": // magenta
+        return "#b48ead";
+        break;
+      case "46": // cyan
+        return "#88c0d0";
+        break;
+      case "47": // white
+        return "#e5e9f0";
         break;
     }
   });
+
+  return backgrounds[backgrounds.length - 1];
 };
 
 const background = (context, width, height) => {
@@ -77,6 +105,7 @@ const background = (context, width, height) => {
 };
 
 const terminal = (context, x, y, width, height) => {
+  context.save();
   context.fillStyle = "#000000";
   context.globalAlpha = 0.75;
 
@@ -102,10 +131,7 @@ const terminal = (context, x, y, width, height) => {
   context.closePath();
   context.fill();
 
-  context.shadowBlur = 0;
-  context.globalAlpha = 1;
-  context.shadowOffsetY = 0;
-  context.shadowBlur = 30;
+  context.restore();
 };
 
 const text = (context, text) => {
@@ -125,18 +151,32 @@ const text = (context, text) => {
   const withModifiers = text.split(/(\x1B.+?m)/);
   let offsetX = leftPosition;
   let offsetY = backgroundVerticalMargin + terminalVerticalMargin;
+  let background = null;
 
   withModifiers.forEach((chunk) => {
     if (chunk.startsWith("\x1B")) {
-      modifier(context, chunk);
+      background = modifier(context, chunk);
     } else {
       const lines = chunk.split("\n");
       lines.forEach((line, index) => {
+        const { width } = context.measureText(line);
+
+        if (background) {
+          context.save();
+          context.fillStyle = background;
+          context.fillRect(
+            offsetX,
+            Math.round(offsetY),
+            width,
+            Math.round(lineHeight)
+          );
+          context.restore();
+        }
+
         context.fillText(line, offsetX, offsetY);
 
         if (index === lines.length - 1) {
-          const { width } = context.measureText(line);
-          offsetX = leftPosition + width;
+          offsetX += width;
         } else {
           offsetX = leftPosition;
           offsetY += lineHeight;
@@ -150,7 +190,14 @@ const print = (input) => {
   const throwableContext = createCanvas(1, 1).getContext("2d");
   throwableContext.font = "20px Fira Code Regular";
 
-  const { width, ...textMeasurements } = throwableContext.measureText(input);
+  const textWithoutModifiers = input
+    .split(/(\x1B.+?m)/)
+    .filter((chunk) => !chunk.startsWith("\x1B"))
+    .join("");
+
+  const { width, ...textMeasurements } = throwableContext.measureText(
+    textWithoutModifiers
+  );
   const height =
     textMeasurements.actualBoundingBoxAscent +
     textMeasurements.actualBoundingBoxDescent;
