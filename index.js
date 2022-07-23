@@ -12,13 +12,13 @@ if (!argv._[0]) {
 }
 
 const palette = {
-  black: "#3b4252",
-  red: "#bf616a",
-  green: "#a3be8c",
-  yellow: "#ebcb8b",
-  blue: "#81a1c1",
-  magenta: "#b48ead",
-  cyan: "#88c0d0",
+  black: "#151515",
+  red: "#a53c23",
+  green: "#7b9246",
+  yellow: "#d3a04d",
+  blue: "#6c99bb",
+  magenta: "#9f4e85",
+  cyan: "#7dd6cf",
   white: "#e5e9f0",
 };
 
@@ -45,6 +45,14 @@ const terminalVerticalMargin = 30;
 const terminalBorderRadius = 20;
 const backgroundHorizontalMargin = 90;
 const backgroundVerticalMargin = 90;
+
+const backgroundGradient = (context, width, height) => {
+  const gradient = context.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, "#88c0d0");
+  gradient.addColorStop(1, "#5e81ac");
+
+  return gradient;
+};
 
 const modifier = (context, modifier) => {
   const parsedModifiers = modifier.match(/(\d+;?)+/);
@@ -115,9 +123,7 @@ const modifier = (context, modifier) => {
 };
 
 const background = (context, width, height) => {
-  const gradient = context.createLinearGradient(0, 0, width, height);
-  gradient.addColorStop(0, "#88c0d0");
-  gradient.addColorStop(1, "#5e81ac");
+  const gradient = backgroundGradient(context, width, height);
 
   context.fillStyle = gradient;
   context.fillRect(0, 0, width, height);
@@ -125,12 +131,37 @@ const background = (context, width, height) => {
 
 const terminal = (context, x, y, width, height) => {
   context.save();
-  context.fillStyle = "#000000";
-  context.globalAlpha = 0.55;
 
   context.shadowColor = "rgba(0, 0, 0, .45)";
   context.shadowOffsetY = 30;
   context.shadowBlur = 35;
+
+  const gradient = backgroundGradient(context, width, height);
+  context.fillStyle = gradient;
+
+  context.beginPath();
+  context.moveTo(x + terminalBorderRadius, y);
+  context.lineTo(x + width - terminalBorderRadius, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + terminalBorderRadius);
+  context.lineTo(x + width, y + height - terminalBorderRadius);
+  context.quadraticCurveTo(
+    x + width,
+    y + height,
+    x + width - terminalBorderRadius,
+    y + height
+  );
+  context.lineTo(x + terminalBorderRadius, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - terminalBorderRadius);
+  context.lineTo(x, y + terminalBorderRadius);
+  context.quadraticCurveTo(x, y, x + terminalBorderRadius, y);
+  context.closePath();
+  context.fill();
+
+  context.restore();
+  context.save();
+
+  context.fillStyle = "#000000";
+  context.globalAlpha = 0.6;
 
   context.beginPath();
   context.moveTo(x + terminalBorderRadius, y);
