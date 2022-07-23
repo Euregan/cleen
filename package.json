@@ -3,13 +3,17 @@
   "version": "0.4.1",
   "main": "index.js",
   "bin": "index.js",
-  "scripts": {},
+  "scripts": {
+    "dev": "nodemon --exec 'colortest | ./index.js --command \"npx colortest | npx cleen example.png\" example.png'"
+  },
   "author": "Valentin Manceaux-Panot",
   "license": "MIT",
   "dependencies": {
-    "canvas": "^2.9.3"
+    "canvas": "^2.9.3",
+    "minimist": "^1.2.6"
   },
   "devDependencies": {
+    "colortest": "^3.0.7",
     "nodemon": "^2.0.19"
   }
 }

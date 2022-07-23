@@ -2,6 +2,25 @@
 
 const fs = require("fs");
 const { createCanvas, registerFont } = require("canvas");
+const argv = require("minimist")(process.argv.slice(2));
+
+// The user didn't specify the target image
+if (!argv._[0]) {
+  console.error("You need to specify the image to output to");
+  console.error("For example: npx cleen image.png");
+  process.exit(1);
+}
+
+const palette = {
+  black: "#3b4252",
+  red: "#bf616a",
+  green: "#a3be8c",
+  yellow: "#ebcb8b",
+  blue: "#81a1c1",
+  magenta: "#b48ead",
+  cyan: "#88c0d0",
+  white: "#e5e9f0",
+};
 
 registerFont(`${__dirname}/FiraCode-Light.ttf`, { family: "Fira Code Light" });
 registerFont(`${__dirname}/FiraCode-Regular.ttf`, {
@@ -35,59 +54,59 @@ const modifier = (context, modifier) => {
     switch (modifier) {
       case "0":
         context.font = "20px Fira Code Regular";
-        context.fillStyle = "white";
+        context.fillStyle = palette.white;
         break;
       case "01":
       case "1":
         context.font = "20px Fira Code Bold";
         break;
-      case "30": // black
-        context.fillStyle = "#3b4252";
+      case "30":
+        context.fillStyle = palette.black;
         break;
-      case "31": // red
-        context.fillStyle = "#bf616a";
+      case "31":
+        context.fillStyle = palette.red;
         break;
-      case "32": // green
-        context.fillStyle = "#a3be8c";
+      case "32":
+        context.fillStyle = palette.green;
         break;
-      case "33": // yellow
-        context.fillStyle = "#ebcb8b";
+      case "33":
+        context.fillStyle = palette.yellow;
         break;
-      case "34": // blue
-        context.fillStyle = "#81a1c1";
+      case "34":
+        context.fillStyle = palette.blue;
         break;
-      case "35": // magenta
-        context.fillStyle = "#b48ead";
+      case "35":
+        context.fillStyle = palette.magenta;
         break;
-      case "36": // cyan
-        context.fillStyle = "#88c0d0";
+      case "36":
+        context.fillStyle = palette.cyan;
         break;
-      case "37": // white
-        context.fillStyle = "#e5e9f0";
+      case "37":
+        context.fillStyle = palette.white;
         break;
-      case "40": // black
-        return "#3b4252";
+      case "40":
+        return palette.black;
         break;
-      case "41": // red
-        return "#bf616a";
+      case "41":
+        return palette.red;
         break;
-      case "42": // green
-        return "#a3be8c";
+      case "42":
+        return palette.green;
         break;
-      case "43": // yellow
-        return "#ebcb8b";
+      case "43":
+        return palette.yellow;
         break;
-      case "44": // blue
-        return "#81a1c1";
+      case "44":
+        return palette.blue;
         break;
-      case "45": // magenta
-        return "#b48ead";
+      case "45":
+        return palette.magenta;
         break;
-      case "46": // cyan
-        return "#88c0d0";
+      case "46":
+        return palette.cyan;
         break;
-      case "47": // white
-        return "#e5e9f0";
+      case "47":
+        return palette.white;
         break;
     }
   });
@@ -138,7 +157,7 @@ const text = (context, text) => {
   context.font = "20px Fira Code Regular";
   context.textAlign = "left";
   context.textBaseline = "top";
-  context.fillStyle = "white";
+  context.fillStyle = palette.white;
 
   const textMeasurements = context.measureText(text);
   const height =
@@ -190,7 +209,9 @@ const print = (input) => {
   const throwableContext = createCanvas(1, 1).getContext("2d");
   throwableContext.font = "20px Fira Code Regular";
 
-  const cleanedInput = input.replace(/^\n/, "").trimEnd();
+  const command = argv.command ? `$ ${argv.command}\n\n` : "";
+
+  const cleanedInput = command + input.replace(/^\n/, "").trimEnd();
 
   const textWithoutModifiers = cleanedInput
     .split(/(\x1B.+?m)/)
@@ -226,5 +247,5 @@ const print = (input) => {
 
   text(context, cleanedInput);
 
-  fs.writeFileSync("./image.png", canvas.toBuffer("image/png"));
+  fs.writeFileSync(argv._[0], canvas.toBuffer("image/png"));
 };
