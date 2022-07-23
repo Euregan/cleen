@@ -107,7 +107,7 @@ const background = (context, width, height) => {
 const terminal = (context, x, y, width, height) => {
   context.save();
   context.fillStyle = "#000000";
-  context.globalAlpha = 0.75;
+  context.globalAlpha = 0.55;
 
   context.shadowColor = "rgba(0, 0, 0, .45)";
   context.shadowOffsetY = 30;
@@ -190,7 +190,9 @@ const print = (input) => {
   const throwableContext = createCanvas(1, 1).getContext("2d");
   throwableContext.font = "20px Fira Code Regular";
 
-  const textWithoutModifiers = input
+  const cleanedInput = input.replace(/^\n/, "").trimEnd();
+
+  const textWithoutModifiers = cleanedInput
     .split(/(\x1B.+?m)/)
     .filter((chunk) => !chunk.startsWith("\x1B"))
     .join("");
@@ -222,7 +224,7 @@ const print = (input) => {
     height + 2 * terminalVerticalMargin
   );
 
-  text(context, input);
+  text(context, cleanedInput);
 
   fs.writeFileSync("./image.png", canvas.toBuffer("image/png"));
 };
