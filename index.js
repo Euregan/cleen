@@ -2,7 +2,10 @@
 
 const fs = require("fs");
 const { createCanvas, registerFont } = require("canvas");
-const argv = require("minimist")(process.argv.slice(2));
+const argv = require("minimist")(process.argv.slice(2), {
+  string: ["command"],
+  boolean: ["display"],
+});
 
 // The user didn't specify the target image
 if (!argv._[0]) {
@@ -33,7 +36,12 @@ registerFont(`${__dirname}/FiraCode-Bold.ttf`, { family: "Fira Code Bold" });
 
   let data = "";
 
-  stdin.on("data", (chunk) => (data += chunk));
+  stdin.on("data", (chunk) => {
+    if (argv.display) {
+      process.stdout.write(chunk);
+    }
+    data += chunk;
+  });
 
   stdin.on("end", () => {
     print(data.slice(0, -1));
