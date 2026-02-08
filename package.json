@@ -1,19 +1,24 @@
 {
   "name": "cleen",
   "version": "1.0.0",
-  "main": "index.js",
-  "bin": "index.js",
+  "main": "dist/index.js",
+  "bin": "dist/cli.js",
   "scripts": {
-    "dev": "nodemon --exec 'colortest | ./index.js --command \"npx colortest | npx cleen example.png\" example.png'"
+    "build": "tsc && chmod +x dist/cli.js"
   },
   "author": "Valentin Manceaux-Panot",
   "license": "MIT",
   "dependencies": {
-    "canvas": "^2.9.3",
+    "canvas": "^3.2.1",
     "minimist": "^1.2.6"
   },
   "devDependencies": {
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^25.2.2",
     "colortest": "^3.0.7",
-    "nodemon": "^2.0.19"
+    "nodemon": "^2.0.19",
+    "pnpm": "^10.29.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }
