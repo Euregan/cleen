@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "bin": "dist/cli.js",
   "scripts": {
-    "build": "tsc && chmod +x dist/cli.js"
+    "build": "tsc && cp FiraCode-Light.ttf dist/FiraCode-Light.ttf && cp FiraCode-Bold.ttf dist/FiraCode-Bold.ttf && cp FiraCode-Regular.ttf dist/FiraCode-Regular.ttf && chmod +x dist/cli.js"
   },
   "author": "Valentin Manceaux-Panot",
   "license": "MIT",
